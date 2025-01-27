@@ -1,0 +1,18 @@
+services:
+  api:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 4000:4000
+    env_file:
+      - path: ./.env
+        required: true
+    command: npm run dev
+
+networks:
+  FormatSheet:
+    external: true
