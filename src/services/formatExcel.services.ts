@@ -10,14 +10,14 @@ import { formatBucket } from './formatMethod/Bucket';
 import formatPermission from './formatMethod/Permission';
 import formatSignPerson from './formatMethod/SignPerson';
 
-async function formatExcel(fileBuffer: Buffer): Promise<any> {
+async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
     const tempAffName = "test";
 
     try {
         let workbook = xlsx.read(fileBuffer, { type: 'buffer' });
         const sheetNames = workbook.SheetNames;
 
-        const allSheetsData: Record<string, any[]> = {};
+        //const allSheetsData: Record<string, any[]> = {};
 
         //ORGANIZE
         let oldOrgData: orgModel[] = [];
@@ -137,14 +137,15 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
             });
 
             //SAVE FILE
-            xlsx.writeFile(workbook, "FormatSheetsTest.xlsx");
-        } else {
-            return null;
-        }
+            //xlsx.writeFile(workbook, "FormatSheetsTest.xlsx"); SAVE ON LOCAL
+            const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
 
-        return 'cool';
+            return buffer;
+        } else {
+            return Buffer.alloc(0);;
+        }
     } catch (error) {
-        return null;
+        return Buffer.alloc(0);;
     }
 }
 
