@@ -28,7 +28,7 @@ type newUserInfoModel = {
     affiliation1: string,
     affiliation2: string,
     affiliation3: string,
-    chrcodemp1: number,
+    chrcodemp1: number | string,
     username: string,
     empInfo: string,
     chrcodemp2: number,

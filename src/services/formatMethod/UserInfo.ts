@@ -1,6 +1,6 @@
 import { NEWUSERINFOCOLUMN, STARTUSERINFOCODE } from "../../config/formatSheetConfig";
 import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
-import { oldUserInfoModel } from "../../models/formatExcel/UserInfo";
+import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/UserInfo";
 
 export function userInfoToModel(sheetData: any): oldUserInfoModel[] {
     const orgStr = JSON.stringify(sheetData);
@@ -31,7 +31,7 @@ export function userInfoToModel(sheetData: any): oldUserInfoModel[] {
     return userInfo;
 }
 
-export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): (string | number)[][] {
+export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): [newUserInfoModel[], (string | number)[][]] {
     if (sheetData.length, orgData.length) {
         let chrcodemp2 = STARTUSERINFOCODE - 1;
 
@@ -55,7 +55,9 @@ export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], o
             NEWUSERINFOCOLUMN.chrcodeemp2
         ];
 
-        const userInfoData: (string | number)[][] = []
+        const userArr: (string | number)[][] = [];
+        const userData: newUserInfoModel[] = [];
+
         sheetData.map((data) => {
             ++chrcodemp2;
 
@@ -77,7 +79,27 @@ export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], o
                 }
             });*/
 
-            userInfoData.push([
+            userData.push({
+                thaiPrefix: data.thaiPrefix,
+                thaiName: data.thaiName,
+                thaiSurname: data.thaiSurname,
+                engPrefix: data.engPrefix,
+                engName: data.engName,
+                engSurname: data.engSurname,
+                nickname: data.nickname,
+                officePhone: data.officePhone,
+                email: data.email,
+                role: data.role,
+                affiliation1: affName,
+                affiliation2: data.officeName,
+                affiliation3: data.officeName,
+                chrcodemp1: chrcodemp1,
+                username: data.username,
+                empInfo: data.empInfo,
+                chrcodemp2: chrcodemp2
+            });
+
+            userArr.push([
                 data.thaiPrefix,
                 data.thaiName,
                 data.thaiSurname,
@@ -96,12 +118,16 @@ export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], o
                 data.empInfo,
                 chrcodemp2
             ]);
+
         });
 
-        userInfoData.splice(0, 0, userInfoColumn);
+        userArr.splice(0, 0, userInfoColumn);
 
-        return userInfoData;
+        return [
+            userData,
+            userArr
+        ];
     } else {
-        return [];
+        return [[],[]];
     }
 }

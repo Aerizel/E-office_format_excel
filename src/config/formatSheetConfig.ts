@@ -58,13 +58,22 @@ export const BUCKETCOLUMN = {
 }
 export const BUCKETRUNCODE = "%r1%";
 //=======[PERMISSION SHEET]=======//
-export const NEWPERMISSIONSHEETNAME = "permission"
+export const NEWPERMISSIONSHEETNAME = "permission";
 export const PERMISSIONCOLUMN = {
     bucketName: "bucket_name",
     bucketID: "bucket_id",
     name: "ชื่อ-สกุล",
     chrcodemp: "chrcodemp",
 }
+//=======[SIGN-PERSON]=======//
+export const NEWSIGNPERSONSHEETNAME = "sign-person";
+export const SIGNPERSONCOLUMN = {
+    bucket_name: "bucket_name",
+    bucket_id: "bucket_id",
+    name: "ชื่อ-นามสกุล",
+    chrcodemp: "chrcodemp",
+}
+
 //=======[SHEET REBEL NAME FOR SEARCH]=======//
 export const SHEETREBEL = [
     OLDORGSHEETNAME,
