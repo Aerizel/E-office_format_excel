@@ -8,6 +8,7 @@ export default function Home() {
     <main className="w-screen h-screen p-5">
       <div className="flex flex-row justify-center items-center">
         <TextGenerateEffect words={words} />
+        
       </div>
     </main>
   );

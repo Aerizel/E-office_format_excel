@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import {
@@ -14,10 +14,11 @@ import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
 import Image from "next/image";
 
-export default function FileuploadHome() {
+export default function TemplateDemo() {
   const toast = useRef<Toast>(null);
   const [totalSize, setTotalSize] = useState(0);
   const fileUploadRef = useRef<FileUpload>(null);
+  const status = 200;
 
   const onTemplateSelect = (e: FileUploadSelectEvent) => {
     let _totalSize = totalSize;
@@ -38,10 +39,19 @@ export default function FileuploadHome() {
     });
 
     setTotalSize(_totalSize);
+
     toast.current?.show({
       severity: "info",
       summary: "Success",
       detail: "File Uploaded",
+    });
+  };
+  const onTemplateError = () => {
+    toast.current?.show({
+      severity: "error",
+      summary: "Upload Failed",
+      detail: "An error occurred while uploading the file.",
+      life: 10000,
     });
   };
 
@@ -96,12 +106,14 @@ export default function FileuploadHome() {
             role="presentation"
             src={file.objectURL}
             width={100}
+            height={100}
           />
           <span className="flex flex-column text-left ml-3">
             {file.name}
             <small>{new Date().toLocaleDateString()}</small>
           </span>
         </div>
+
         <Tag
           value={props.formatSize}
           severity="warning"
@@ -158,7 +170,7 @@ export default function FileuploadHome() {
   };
 
   return (
-    <div>
+    <div className="w-[100%] h-[50%] flex flex-row justify-center items-center">
       <Toast ref={toast}></Toast>
 
       <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
@@ -170,11 +182,11 @@ export default function FileuploadHome() {
         name="demo[]"
         url="/api/upload"
         multiple
-        accept="image/*"
+        accept="file"
         maxFileSize={1000000}
         onUpload={onTemplateUpload}
         onSelect={onTemplateSelect}
-        onError={onTemplateClear}
+        onError={onTemplateError}
         onClear={onTemplateClear}
         headerTemplate={headerTemplate}
         itemTemplate={itemTemplate}

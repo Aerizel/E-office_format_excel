@@ -3,7 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FloatingNavAll } from "@/components/ui/FloatingNavAll";
 import { FloatingDockDemo } from "@/components/ui/FloatingDock";
-import { PrimeReactProvider } from "primereact/api";
+import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
+import "primereact/resources/themes/saga-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primereact/resources/themes/lara-light-cyan/theme.css";
+import "primeicons/primeicons.css";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
