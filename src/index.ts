@@ -6,6 +6,13 @@ import cors from 'cors';
 const app: Application = express();
 const port: number = 4000;
 
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true
+};
+
+app.use(cors<Request>(corsOptions));
+
 configBodyParser(app);
 
 app.get("/", (req: Request, res: Response) => {
