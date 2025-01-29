@@ -1,13 +1,14 @@
 import * as xlsx from 'xlsx';
-import { GROUPSHEETNAME, NEWBUCKETSHEETNAME, NEWORGSHEETNAME, NEWUSERINFOSHEETNAME, OLDORGSHEETNAME, OLDUSERINFOSHEETNAME, SHEETREBEL } from '../config/formatSheetConfig';
+import { GROUPSHEETNAME, NEWBUCKETSHEETNAME, NEWORGSHEETNAME, NEWPERMISSIONSHEETNAME, NEWSIGNPERSONSHEETNAME, NEWUSERINFOSHEETNAME, OLDORGSHEETNAME, OLDUSERINFOSHEETNAME, SHEETREBEL } from '../config/formatSheetConfig';
 import { organizeToModel, formatOrganizeStructure } from './formatMethod/OrganizeStructure';
 import { orgModel } from '../models/formatExcel/OrganizeStructureModel';
 import { groupModel } from '../models/formatExcel/GroupModel';
 import { groupFormat, groupToJson } from './formatMethod/Group';
-import { oldUserInfoModel } from '../models/formatExcel/UserInfo';
+import { newUserInfoModel, oldUserInfoModel } from '../models/formatExcel/UserInfo';
 import { formatUserInfo, userInfoToModel } from './formatMethod/UserInfo';
 import { formatBucket } from './formatMethod/Bucket';
 import formatPermission from './formatMethod/Permission';
+import formatSignPerson from './formatMethod/SignPerson';
 
 async function formatExcel(fileBuffer: Buffer): Promise<any> {
     const tempAffName = "test";
@@ -29,7 +30,8 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
         let groupArr: (string | number)[][] = [];
 
         //USER INFO
-        let userData: oldUserInfoModel[] = [];
+        let oldUserData: oldUserInfoModel[] = [];
+        let newUserData: newUserInfoModel[] = [];
         let userArr: (string | number)[][] = [];
 
         //BUCKET
@@ -37,6 +39,9 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
 
         //PERMISSION
         let permissionArr: (string | number)[][] = [];
+
+        //SIGN-PERSON
+        let signPersonArr: (string | number)[][] = [];
 
         let index: number = 0;
         let sheetRebel: number = 0;
@@ -78,11 +83,6 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
                         bucketArr = formatBucket(uniqueOrgData, groupData);
                     }
 
-                    //PERMISSION SHEET DATA
-                    if (uniqueOrgData.length && groupData.length) {
-                        //permissionArr = formatPermission(uniqueOrgData, groupData);
-                    }
-
                 } else if (OLDUSERINFOSHEETNAME == SHEETREBEL[sheetRebel]) {
                     const jsonData = xlsx.utils.sheet_to_json(sheet, {
                         raw: true,
@@ -90,9 +90,19 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
                     });
 
                     //USER INFO SHEET 
-                    userData = userInfoToModel(jsonData);
-                    if (userData && newOrgData.length) {
-                        userArr = formatUserInfo(tempAffName, userData, newOrgData);
+                    oldUserData = userInfoToModel(jsonData);
+                    if (oldUserData && newOrgData.length) {
+                        [newUserData, userArr] = formatUserInfo(tempAffName, oldUserData, newOrgData);
+                    }
+
+                    //PERMISSION SHEET DATA
+                    if (uniqueOrgData.length && groupData.length && newUserData.length) {
+                        permissionArr = formatPermission(uniqueOrgData, groupData, newUserData);
+                    }
+
+                    //SIGN-PERSON SHEET DATA
+                    if (oldOrgData.length && groupData.length && newUserData.length) {
+                        signPersonArr = formatSignPerson(oldOrgData, groupData, newUserData);
                     }
                 }
 
@@ -106,13 +116,15 @@ async function formatExcel(fileBuffer: Buffer): Promise<any> {
             ++index;
         }
 
-        if (newOrgArr.length && groupArr && userArr.length && bucketArr.length) {
+        if (newOrgArr.length && groupArr && userArr.length && bucketArr.length && permissionArr) {
             //All SHEET OF ONE EXCEL FILE
             const datasets: { name: string; data: (string | number)[][] }[] = [
                 { name: NEWORGSHEETNAME, data: newOrgArr },
                 { name: GROUPSHEETNAME, data: groupArr },
                 { name: NEWUSERINFOSHEETNAME, data: userArr },
-                { name: NEWBUCKETSHEETNAME, data: bucketArr }
+                { name: NEWBUCKETSHEETNAME, data: bucketArr },
+                { name: NEWPERMISSIONSHEETNAME, data: permissionArr },
+                { name: NEWSIGNPERSONSHEETNAME, data: signPersonArr }
             ];
 
             //CREATE NEW NEW WORKBOOK
