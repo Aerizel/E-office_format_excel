@@ -1,27 +1,29 @@
-import { NEWORGCOLUMN, OLDORGCOLUMN, STARTORGCODE } from "../../config/formatSheet";
-import { organizeJsonModel } from "../../models/formatExcel/organizeStructure";
+import { NEWORGCOLUMN, OLDORGCOLUMN, STARTORGCODE } from "../../config/formatSheetConfig";
+import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
 
-function organizeToJson(sheetData: any): organizeJsonModel[] {
-    const orgNameLabel: string = OLDORGCOLUMN[0];
-    const statusLabel: string = OLDORGCOLUMN[1];
-    const pCommitLabel: string = OLDORGCOLUMN[2];
-    const pPermitLabel: string = OLDORGCOLUMN[3];
-
+export function organizeToModel(sheetData: any): orgModel[] {
     const orgStr = JSON.stringify(sheetData);
     const orgObj = JSON.parse(orgStr);
-    const orgData: organizeJsonModel[] = [];
+    const orgData: orgModel[] = [];
+    let type: number = 1;
 
     for (var data of orgObj) {
-        const orgName: string = data[orgNameLabel];
-        const orgStatus: boolean = data[statusLabel];
-        const pCommit: string = data[pCommitLabel];
-        const pPermit: string = data[pPermitLabel];
+        const orgName: string = data[OLDORGCOLUMN.doc];
+        const orgStatus: boolean = data[OLDORGCOLUMN.status];
+        const pCommit: string = data[OLDORGCOLUMN.pCommit];
+        const pPermit: string = data[OLDORGCOLUMN.pPermit];
+
+        if (orgName === OLDORGCOLUMN.doc2) {
+            type = 2;
+        }
 
         if (orgName && (orgStatus != null || pCommit || pPermit)) {
-            const newformat: organizeJsonModel = {
+            const newformat: orgModel = {
                 doc: orgName,
                 pCommit: pCommit,
-                pPermit: pPermit
+                pPermit: pPermit,
+                chcodemp: null,
+                type: type,
             }
             orgData.push(newformat);
         }
@@ -32,10 +34,10 @@ function organizeToJson(sheetData: any): organizeJsonModel[] {
     return orgData;
 }
 
-function organizeStructure(sheetData: organizeJsonModel[]): (string | number)[][] {
+export function formatOrganizeStructure(sheetData: orgModel[], affName1: string): [orgModel[], (string | number)[][]] {
     let chcodemp = STARTORGCODE - 1;
-    const orgColumn: string[] = [NEWORGCOLUMN[0], NEWORGCOLUMN[1], NEWORGCOLUMN[2], NEWORGCOLUMN[3]];
-    const affiliation1: string[] = ['test', '', ''];
+    const orgColumn: string[] = [NEWORGCOLUMN.affiliation1, NEWORGCOLUMN.affiliation2, NEWORGCOLUMN.affiliation3, NEWORGCOLUMN.chrcodemp];
+    const affiliation1: string[] = [affName1, '', ''];
 
     /*const orgData: (string | number)[][] = sheetData.map((data, index) => {
         if (index % 2) {
@@ -46,21 +48,29 @@ function organizeStructure(sheetData: organizeJsonModel[]): (string | number)[][
         }
     });*/
 
-    const orgData: (string | number)[][] = []
+    const orgArr: (string | number)[][] = [];
+    const orgData: orgModel[] = [];
+
     sheetData.map((data) => {
         ++chcodemp;
-        orgData.push(['', data.doc, '', '']);
-        orgData.push(['', '', data.doc, chcodemp]);
+        orgArr.push(['', data.doc, '', '']);
+        orgArr.push(['', '', data.doc, chcodemp]);
+
+        const orgTempData: orgModel = {
+            doc: data.doc,
+            pCommit: data.pCommit,
+            pPermit: data.pPermit,
+            chcodemp: chcodemp,
+            type: data.type
+        }
+        orgData.push(orgTempData);
     });
 
-    orgData.splice(0, 0, orgColumn);
-    orgData.splice(1, 0, affiliation1);
+    orgArr.splice(0, 0, orgColumn);
+    orgArr.splice(1, 0, affiliation1);
 
-    return orgData;
+    return [
+        orgData,
+        orgArr
+    ];
 }
-
-export {
-    organizeToJson,
-    organizeStructure
-}
-

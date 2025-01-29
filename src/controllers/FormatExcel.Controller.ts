@@ -27,8 +27,8 @@ export const uploadExcel = [
             } else {
                 //const data = await formatExcel(req.file.buffer);
                 const data = await formatExcel(fileBuffer);  
-                if (data) {
-                    res.status(200).json({ message: 'File processed successfully', data });
+                if (data.length) {
+                    res.status(200).json({ message: 'File processed successfully', data: data });
                 } else {
                     res.status(500).json({ message: 'Fail to format excel file' });
                 }
