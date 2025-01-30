@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Controller function to handle the Excel file upload
 export const uploadExcel = [
-    upload.single('file'),  
+    upload.single('file'),
     async (req: Request, res: Response): Promise<void> => {
         try {
             /*//Local test// const filePath = path.join(__dirname, '../test/ไฟล์ตัวอย่างการ Implement.xlsx');
@@ -21,8 +21,14 @@ export const uploadExcel = [
                 const excelBuffer: Buffer = await formatExcel(req.file.buffer);
                 //const data = await formatExcel(fileBuffer);  
                 if (excelBuffer.length > 0) {
-                    // Set response headers for file download
-                    res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
+                    const fileName = "ไฟล์ที่ถูกประมวลผล.xlsx";
+
+                    const encodedFileName = encodeURIComponent(fileName);
+
+                    res.setHeader(
+                        "Content-Disposition",
+                        `attachment; filename*=UTF-8''${encodedFileName}`
+                    );
                     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
                     res.status(200).send(excelBuffer);
