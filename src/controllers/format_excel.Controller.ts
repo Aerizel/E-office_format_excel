@@ -8,7 +8,7 @@ import { responseModel } from "../models/orther/responseModel";
 
 // Configure Multer to handle file upload
 //const upload = multer({ storage: multer.memoryStorage() });
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 }});
 
 // Single file upload method
 // export const uploadExcel = [
