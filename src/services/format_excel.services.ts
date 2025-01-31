@@ -1,23 +1,23 @@
 import * as xlsx from 'xlsx';
-import { GROUPSHEETNAME, NEWBUCKETSHEETNAME, NEWORGSHEETNAME, NEWPERMISSIONSHEETNAME, NEWSIGNPERSONSHEETNAME, NEWUSERINFOSHEETNAME, OLDORGSHEETNAME, OLDUSERINFOSHEETNAME, SHEETREBEL } from '../config/formatSheetConfig';
-import { organizeToModel, formatOrganizeStructure } from './formatMethod/OrganizeStructure';
-import { orgModel } from '../models/formatExcel/OrganizeStructureModel';
-import { groupModel } from '../models/formatExcel/GroupModel';
-import { groupFormat, groupToJson } from './formatMethod/Group';
-import { newUserInfoModel, oldUserInfoModel } from '../models/formatExcel/UserInfo';
-import { formatUserInfo, userInfoToModel } from './formatMethod/UserInfo';
-import { formatBucket } from './formatMethod/Bucket';
-import formatPermission from './formatMethod/Permission';
-import formatSignPerson from './formatMethod/SignPerson';
+import { GROUPSHEETNAME, NEWBUCKETSHEETNAME, NEWORGSHEETNAME, NEWPERMISSIONSHEETNAME, NEWSIGNPERSONSHEETNAME, NEWUSERINFOSHEETNAME, OLDORGSHEETNAME, OLDUSERINFOSHEETNAME, SHEETREBEL } from '../config/format_sheet_config';
+import { OrganizeToModel, FormatOrganizeStructure } from './format_method/organize_structure';
+import { orgModel } from '../models/formatExcel/organize_structure_model';
+import { groupModel } from '../models/formatExcel/group_model';
+import { GroupFormat, GroupToJson } from './format_method/group';
+import { newUserInfoModel, oldUserInfoModel } from '../models/formatExcel/user_info';
+import { FormatUserInfo, UserInfoToModel } from './format_method/user_info';
+import { FormatBucket } from './format_method/bucket';
+import formatPermission from './format_method/permission';
+import formatSignPerson from './format_method/signPerson';
 
-async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
+export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
     const tempAffName = "test";
 
     try {
         let workbook = xlsx.read(fileBuffer, { type: 'buffer' });
         const sheetNames = workbook.SheetNames;
 
-        //const allSheetsData: Record<string, any[]> = {};
+        //const allSheetsData: Record<string, any[]> = {};s
 
         //ORGANIZE
         let oldOrgData: orgModel[] = [];
@@ -56,7 +56,7 @@ async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
                     const jsonData = xlsx.utils.sheet_to_json(sheet);
 
                     //GROUP SHEET DATA
-                    oldOrgData = organizeToModel(jsonData);
+                    oldOrgData = OrganizeToModel(jsonData);
 
                     /*oldOrgData.forEach(data => {
                         console.log(data.doc+', '+data.pCommit,', ',data.pPermit,', ',data.type);
@@ -69,18 +69,18 @@ async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
 
                     //NEW FORMAT OF ORGANIZE STRUCTURE 
                     if (uniqueOrgData.length) {
-                        [newOrgData, newOrgArr] = formatOrganizeStructure(uniqueOrgData, tempAffName);
+                        [newOrgData, newOrgArr] = FormatOrganizeStructure(uniqueOrgData, tempAffName);
                     }
 
                     //GROUP SHEET DATA
                     if (uniqueOrgData.length) {
-                        groupData = groupToJson(uniqueOrgData, tempAffName);
-                        groupArr = groupFormat(groupData);
+                        groupData = GroupToJson(uniqueOrgData, tempAffName);
+                        groupArr = GroupFormat(groupData);
                     }
 
                     //BUCKET SHEET DATA
                     if (uniqueOrgData.length && groupData) {
-                        bucketArr = formatBucket(uniqueOrgData, groupData);
+                        bucketArr = FormatBucket(uniqueOrgData, groupData);
                     }
 
                 } else if (OLDUSERINFOSHEETNAME == SHEETREBEL[sheetRebel]) {
@@ -90,9 +90,9 @@ async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
                     });
 
                     //USER INFO SHEET 
-                    oldUserData = userInfoToModel(jsonData);
+                    oldUserData = UserInfoToModel(jsonData);
                     if (oldUserData && newOrgData.length) {
-                        [newUserData, userArr] = formatUserInfo(tempAffName, oldUserData, newOrgData);
+                        [newUserData, userArr] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
                     }
 
                     //PERMISSION SHEET DATA
@@ -147,8 +147,4 @@ async function formatExcel(fileBuffer: Buffer): Promise<Buffer> {
     } catch (error) {
         return Buffer.alloc(0);;
     }
-}
-
-export {
-    formatExcel
 }

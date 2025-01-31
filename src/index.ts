@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import routes from "./routes";
-import { configBodyParser } from "./middleware/bodyParser";
+import { configBodyParser } from "./middleware/body_parser";
 import cors from 'cors';
 
 const app: Application = express();
@@ -17,7 +17,7 @@ configBodyParser(app);
 
 app.get("/", (req: Request, res: Response) => {
     res.status(200).json({
-        status: "success connected.",
+        status: "Connected scessfully.",
     });
 });
 

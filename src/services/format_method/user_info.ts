@@ -1,8 +1,8 @@
-import { NEWUSERINFOCOLUMN, STARTUSERINFOCODE } from "../../config/formatSheetConfig";
-import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
-import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/UserInfo";
+import { NEWUSERINFOCOLUMN, STARTUSERINFOCODE } from "../../config/format_sheet_config";
+import { orgModel } from "../../models/formatExcel/organize_structure_model";
+import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/user_info";
 
-export function userInfoToModel(sheetData: any): oldUserInfoModel[] {
+export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     const orgStr = JSON.stringify(sheetData);
     const userObj: Record<string, any>[] = JSON.parse(orgStr);
     let userInfo: oldUserInfoModel[] = [];
@@ -31,7 +31,7 @@ export function userInfoToModel(sheetData: any): oldUserInfoModel[] {
     return userInfo;
 }
 
-export function formatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): [newUserInfoModel[], (string | number)[][]] {
+export function FormatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): [newUserInfoModel[], (string | number)[][]] {
     if (sheetData.length, orgData.length) {
         let chrcodemp2 = STARTUSERINFOCODE - 1;
 

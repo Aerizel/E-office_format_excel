@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { uploadExcel } from "../controllers/FormatExcel.Controller";
+import { uploadExcel } from "../controllers/format_excel.Controller";
 
 const router = Router();
 

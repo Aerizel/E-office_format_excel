@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
 import multer from "multer";
-import { formatExcel } from "../services/formatExcel.services";
+import { FormatExcel } from "../services/format_excel.services";
 import { fileStatusModel } from "../models/orther/statusFile";
-import * as fs from 'fs';
-import path from 'path';
+// import * as fs from 'fs';
+// import path from 'path';
 import { responseModel } from "../models/orther/responseModel";
 
 // Configure Multer to handle file upload
@@ -55,12 +55,13 @@ export const uploadExcel = [
     upload.array("files"),
     async (req: Request, res: Response): Promise<void> => {
         const files = req.files as Express.Multer.File[];
-        const fileQueue: {
-            file: Express.Multer.File;
-            status: fileStatusModel
-        }[] = [];
 
-        if (files || files != 0) {
+        if (files !== undefined) {
+            const fileQueue: {
+                file: Express.Multer.File;
+                status: fileStatusModel
+            }[] = [];
+
             //CREATE QUEUE
             files.forEach((file) => {
                 fileQueue.push({
@@ -72,15 +73,14 @@ export const uploadExcel = [
                 })
             });
 
-            processQueue(fileQueue, res);
-
+            ProcessQueue(fileQueue, res);
         } else {
             res.status(400).json({ message: 'No file upload.' });
         }
     }
 ]
 
-async function processQueue(fileQueue: { file: Express.Multer.File; status: fileStatusModel }[], res: Response) {
+async function ProcessQueue(fileQueue: { file: Express.Multer.File; status: fileStatusModel }[], res: Response) {
     const responses: responseModel[] = [];
 
     while (fileQueue.length > 0) {
@@ -88,7 +88,7 @@ async function processQueue(fileQueue: { file: Express.Multer.File; status: file
 
         try {
             //FORMAT EXCEL 
-            const excelBuffer: Buffer = await formatExcel(file.buffer);
+            const excelBuffer: Buffer = await FormatExcel(file.buffer);
 
             if (excelBuffer.length > 0) {
                 responses.push({
@@ -98,12 +98,12 @@ async function processQueue(fileQueue: { file: Express.Multer.File; status: file
                 });
             } else {
                 //SET FAIL STATUS FOR THIS FILE
-                responses.push({name: status.name, status: "failed", file: ''});
+                responses.push({ name: status.name, status: "failed", file: '' });
             }
 
         } catch (error) {
             //SET FAIL STATUS FOR THIS FILE
-            responses.push({name: status.name, status: "failed", file: ''});
+            responses.push({ name: status.name, status: "failed", file: '' });
         }
     }
 

@@ -1,8 +1,8 @@
-import { BUCKETCOLUMN, BUCKETRUNCODE } from "../../config/formatSheetConfig";
-import { groupModel } from "../../models/formatExcel/GroupModel";
-import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
+import { BUCKETCOLUMN, BUCKETRUNCODE } from "../../config/format_sheet_config";
+import { groupModel } from "../../models/formatExcel/group_model";
+import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
-export function formatBucket(orgData: orgModel[], groupData: groupModel[]): (string | number)[][] {
+export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (string | number)[][] {
     const columnName: string[] = [
         BUCKETCOLUMN.groupName,
         BUCKETCOLUMN.groupID,

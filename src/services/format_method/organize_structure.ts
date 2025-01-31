@@ -1,7 +1,7 @@
-import { NEWORGCOLUMN, OLDORGCOLUMN, STARTORGCODE } from "../../config/formatSheetConfig";
-import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
+import { NEWORGCOLUMN, OLDORGCOLUMN, STARTORGCODE } from "../../config/format_sheet_config";
+import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
-export function organizeToModel(sheetData: any): orgModel[] {
+export function OrganizeToModel(sheetData: any): orgModel[] {
     const orgStr = JSON.stringify(sheetData);
     const orgObj = JSON.parse(orgStr);
     const orgData: orgModel[] = [];
@@ -34,7 +34,7 @@ export function organizeToModel(sheetData: any): orgModel[] {
     return orgData;
 }
 
-export function formatOrganizeStructure(sheetData: orgModel[], affName1: string): [orgModel[], (string | number)[][]] {
+export function FormatOrganizeStructure(sheetData: orgModel[], affName1: string): [orgModel[], (string | number)[][]] {
     let chcodemp = STARTORGCODE - 1;
     const orgColumn: string[] = [NEWORGCOLUMN.affiliation1, NEWORGCOLUMN.affiliation2, NEWORGCOLUMN.affiliation3, NEWORGCOLUMN.chrcodemp];
     const affiliation1: string[] = [affName1, '', ''];
