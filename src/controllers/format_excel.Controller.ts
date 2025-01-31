@@ -67,7 +67,7 @@ export const uploadExcel = [
                 fileQueue.push({
                     file,
                     status: {
-                        name: file.originalname,
+                        name: Buffer.from(file.originalname, 'latin1').toString('utf8'),
                         status: "pending"
                     }
                 })
