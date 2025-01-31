@@ -8,7 +8,7 @@ import { responseModel } from "../models/orther/responseModel";
 
 // Configure Multer to handle file upload
 //const upload = multer({ storage: multer.memoryStorage() });
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 }});
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 }}); //limit size to 50 MB
 
 // Single file upload method
 // export const uploadExcel = [
@@ -67,7 +67,7 @@ export const uploadExcel = [
                 fileQueue.push({
                     file,
                     status: {
-                        name: file.originalname,
+                        name: decodeURIComponent((file.originalname)),
                         status: "pending"
                     }
                 })
