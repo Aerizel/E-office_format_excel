@@ -5,7 +5,6 @@ import { fileStatusModel } from "../models/orther/statusFile";
 // import * as fs from 'fs';
 // import path from 'path';
 import { responseModel } from "../models/orther/responseModel";
-import { escape } from "querystring";
 
 // Configure Multer to handle file upload
 //const upload = multer({ storage: multer.memoryStorage() });
@@ -65,10 +64,14 @@ export const uploadExcel = [
 
             //CREATE QUEUE
             files.forEach((file) => {
+                // const name = decodeURIComponent(
+                //     Buffer.from(file.originalname, "binary").toString("utf-8")
+                // );
+                //console.log('file name: '+file.originalname);
                 fileQueue.push({
                     file,
                     status: {
-                        name: decodeURIComponent(escape(file.originalname)),
+                        name: Buffer.from(file.originalname, "latin1").toString("utf8"),
                         status: "pending"
                     }
                 })
