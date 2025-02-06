@@ -20,4 +20,6 @@ RUN npm ci --only=production
 
 COPY --from=development /usr/src/app/dist ./dist
 
+ENV NODE_ENV=production
+
 CMD ["node", "dist/index.js"]

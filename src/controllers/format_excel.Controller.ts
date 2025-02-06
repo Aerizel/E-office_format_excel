@@ -5,10 +5,11 @@ import { fileStatusModel } from "../models/orther/statusFile";
 // import * as fs from 'fs';
 // import path from 'path';
 import { responseModel } from "../models/orther/responseModel";
+import { cutStringWithDash } from "../utils/formatString";
 
 // Configure Multer to handle file upload
 //const upload = multer({ storage: multer.memoryStorage() });
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 }}); //limit size to 50 MB
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }); //limit size to 50 MB
 
 // Single file upload method
 // export const uploadExcel = [
@@ -58,8 +59,9 @@ export const uploadExcel = [
 
         if (files !== undefined) {
             const fileQueue: {
-                file: Express.Multer.File;
-                status: fileStatusModel
+                file: Express.Multer.File,
+                orgName: string,
+                status: fileStatusModel,
             }[] = [];
 
             //CREATE QUEUE
@@ -68,54 +70,68 @@ export const uploadExcel = [
                 //     Buffer.from(file.originalname, "binary").toString("utf-8")
                 // );
                 //console.log('file name: '+file.originalname);
+
+                const convertName = Buffer.from(`${file.originalname.replace(/\.[^/.]+$/, "")}`, "latin1").toString("utf8");
+                const filename = convertName + ' แก้ไข.xlsx';
+                const cutName: string | null = cutStringWithDash(convertName);
+                const orgName = cutName != null ? cutName : 'none';
+
                 fileQueue.push({
                     file,
+                    orgName,
                     status: {
-                        name: Buffer.from(file.originalname, "latin1").toString("utf8"),
+                        name: filename,
                         status: "pending"
                     }
                 })
             });
 
             ProcessQueue(fileQueue, res);
+
         } else {
-            res.status(400).json({ message: 'No file upload.' });
+            res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์ Excel ก่อน' });
         }
     }
 ]
 
-async function ProcessQueue(fileQueue: { file: Express.Multer.File; status: fileStatusModel }[], res: Response) {
+async function ProcessQueue(fileQueue: { file: Express.Multer.File, orgName: string, status: fileStatusModel }[], res: Response) {
     const responses: responseModel[] = [];
 
     while (fileQueue.length > 0) {
-        const { file, status } = fileQueue.shift()!;
+        const { file, orgName, status } = fileQueue.shift()!;
 
         try {
+            let excelBuffer: Buffer = Buffer.alloc(0);
+            let errorLog: string = '';
+
             //FORMAT EXCEL 
-            const excelBuffer: Buffer = await FormatExcel(file.buffer);
+            [excelBuffer, errorLog] = await FormatExcel(file.buffer, orgName);
 
             if (excelBuffer.length > 0) {
                 responses.push({
                     name: status.name,
                     status: 'success',
+                    fail: errorLog,
                     file: excelBuffer.toString("base64"),
                 });
             } else {
                 //SET FAIL STATUS FOR THIS FILE
-                responses.push({ name: status.name, status: "failed", file: '' });
+                responses.push({ name: status.name, status: "failed", fail: errorLog, file: '' });
             }
 
         } catch (error) {
             //SET FAIL STATUS FOR THIS FILE
-            responses.push({ name: status.name, status: "failed", file: '' });
+            responses.push({ name: status.name, status: "failed", fail: '', file: '' });
+            console.log(error);
         }
     }
 
     if (fileQueue.length === 0) {
         try {
             res.status(200).json({ message: "Files processed", data: responses });
-        } catch {
+        } catch (error) {
             res.status(500).json({ message: "Error processing files." });
+            console.log(error);
         }
 
         res.end();

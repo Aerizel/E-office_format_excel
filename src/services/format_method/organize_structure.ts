@@ -4,6 +4,7 @@ import { orgModel } from "../../models/formatExcel/organize_structure_model";
 export function OrganizeToModel(sheetData: any): orgModel[] {
     const orgStr = JSON.stringify(sheetData);
     const orgObj = JSON.parse(orgStr);
+
     const orgData: orgModel[] = [];
     let type: number = 1;
 

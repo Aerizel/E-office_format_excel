@@ -10,14 +10,17 @@ import { FormatBucket } from './format_method/bucket';
 import formatPermission from './format_method/permission';
 import formatSignPerson from './format_method/signPerson';
 
-export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
-    const tempAffName = "test";
+export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise<[Buffer, string]> {
+    const tempAffName = fileName;
+    const sheetError = 'ไม่สามารถอ่านชีทในไฟล์ Excel ได้เนื่องจากชื่อไม่ถูกต้องหรือไม่มีหน้าชีทนั้นอยู่';
+    const readErrorReason = 'ไม่สามารถอ่านข้อมูลได้เนื่องจากโครงสร้างไม่ถูกต้องหรือไม่มีข้อมูล';
+    let errorLog: string[] = [];
 
     try {
         let workbook = xlsx.read(fileBuffer, { type: 'buffer' });
         const sheetNames = workbook.SheetNames;
 
-        //const allSheetsData: Record<string, any[]> = {};s
+        //const allSheetsData: Record<string, any[]> = {};
 
         //ORGANIZE
         let oldOrgData: orgModel[] = [];
@@ -53,19 +56,20 @@ export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
 
             if (sheetNames[index] == SHEETREBEL[sheetRebel]) {
                 if (OLDORGSHEETNAME == SHEETREBEL[sheetRebel]) {
+                    //USE LIBERY XLSX TO GET DATA FROM EXCEL AND CONVERT DATA TO JSON TYPE
                     const jsonData = xlsx.utils.sheet_to_json(sheet);
 
                     //GROUP SHEET DATA
                     oldOrgData = OrganizeToModel(jsonData);
 
-                    /*oldOrgData.forEach(data => {
-                        console.log(data.doc+', '+data.pCommit,', ',data.pPermit,', ',data.type);
-                    });*/
-
-                    //DELETE DUPLICATE DATA
-                    uniqueOrgData = Array.from(
-                        new Map(oldOrgData.map(data => [data.doc, data])).values()
-                    );
+                    //DELETE DUPLICATE DATA OF GROUP SHEET DATA
+                    if(oldOrgData.length) {
+                        uniqueOrgData = Array.from(
+                            new Map(oldOrgData.map(data => [data.doc, data])).values()
+                        );
+                    } else {
+                        errorLog.push(`ชีทโครงสร้าง : ${readErrorReason}`);
+                    }
 
                     //NEW FORMAT OF ORGANIZE STRUCTURE 
                     if (uniqueOrgData.length) {
@@ -84,6 +88,7 @@ export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
                     }
 
                 } else if (OLDUSERINFOSHEETNAME == SHEETREBEL[sheetRebel]) {
+                    //CONFIG XLSX LIBRARY TO GET ANY ROW OF SHEET
                     const jsonData = xlsx.utils.sheet_to_json(sheet, {
                         raw: true,
                         defval: "",
@@ -93,6 +98,8 @@ export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
                     oldUserData = UserInfoToModel(jsonData);
                     if (oldUserData && newOrgData.length) {
                         [newUserData, userArr] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
+                    } else {
+                        errorLog.push(`ชีทข้อมูลผู้ใช้ : ${readErrorReason}`);
                     }
 
                     //PERMISSION SHEET DATA
@@ -127,7 +134,7 @@ export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
                 { name: NEWSIGNPERSONSHEETNAME, data: signPersonArr }
             ];
 
-            //CREATE NEW NEW WORKBOOK
+            //CREATE NEW WORKBOOK
             workbook = xlsx.utils.book_new();
 
             //CREATE NEW EXCEL FILE THAT HAVE NEW SHEET INSIDE IT
@@ -140,11 +147,12 @@ export async function FormatExcel(fileBuffer: Buffer): Promise<Buffer> {
             //xlsx.writeFile(workbook, "FormatSheetsTest.xlsx"); SAVE ON LOCAL
             const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
 
-            return buffer;
+            return [buffer, errorLog.join("\n")];
         } else {
-            return Buffer.alloc(0);;
+            errorLog.push(sheetError);
+            return [Buffer.alloc(0), errorLog.join("\n")];
         }
     } catch (error) {
-        return Buffer.alloc(0);;
+        return [Buffer.alloc(0), errorLog.join("\n")];
     }
 }
