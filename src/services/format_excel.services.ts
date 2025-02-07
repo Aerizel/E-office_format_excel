@@ -165,6 +165,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
             return [Buffer.alloc(0), errorLog.join("\n")];
         }
     } catch (error) {
+        console.log(error);
         return [Buffer.alloc(0), errorLog.join("\n")];
     }
 }

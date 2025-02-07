@@ -158,7 +158,7 @@ async function ProcessQueue(fileQueue: { file: Express.Multer.File, orgName: str
 
         } catch (error) {
             //SET FAIL STATUS FOR THIS FILE
-            responses.push({ name: status.name, status: "failed", fail: '', file: '' });
+            responses.push({ name: status.name, status: "failed", fail: 'เกิดข้อผิดพลาด', file: '' });
             console.log(error);
         }
     }
