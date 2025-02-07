@@ -1,5 +1,5 @@
 import * as xlsx from 'xlsx';
-import { GROUPSHEETNAME, NEWBUCKETSHEETNAME, NEWORGSHEETNAME, NEWPERMISSIONSHEETNAME, NEWSIGNPERSONSHEETNAME, NEWUSERINFOSHEETNAME, OLDORGSHEETNAME, OLDUSERINFOSHEETNAME, SHEETREBEL } from '../config/format_sheet_config';
+import { GROUP_SHEET_NAME, NEW_BUCKET_SHEET_NAME, NEW_ORG_SHEET_NAME, NEW_PERMISSION_SHEET_NAME, NEW_SIGN_PERSON_SHEET_NAME, NEW_USERINFO_SHEET_NAME, OLD_ORG_SHEET_NAME, OLD_USERINFO_SHEET_NAME, SHEETREBEL } from '../config/format_sheet_config';
 import { OrganizeToModel, FormatOrganizeStructure } from './format_method/organize_structure';
 import { orgModel } from '../models/formatExcel/organize_structure_model';
 import { groupModel } from '../models/formatExcel/group_model';
@@ -12,8 +12,8 @@ import formatSignPerson from './format_method/signPerson';
 
 export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise<[Buffer, string]> {
     const tempAffName = fileName;
-    const sheetError = 'ไม่สามารถอ่านชีทในไฟล์ Excel ได้เนื่องจากชื่อไม่ถูกต้องหรือไม่มีหน้าชีทนั้นอยู่';
-    const readErrorReason = 'ไม่สามารถอ่านข้อมูลได้เนื่องจากโครงสร้างไม่ถูกต้องหรือไม่มีข้อมูล';
+    const sheetError = 'ไม่เจอชีทเนื่องจากชื่อไม่ถูกต้องหรือไม่มีหน้าชีทนั้นอยู่';
+    const readErrorReason = 'ไม่สามารถอ่านข้อมูลในชีทได้เนื่องจากโครงสร้างไม่ถูกต้องหรือไม่มีข้อมูล';
     let errorLog: string[] = [];
 
     try {
@@ -48,14 +48,16 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
 
         let index: number = 0;
         let sheetRebel: number = 0;
+        let sheetNullData: number = 0;
         let status: Boolean = true;
 
-        while (index < sheetNames.length && status) {
+        while (index <= sheetNames.length - 1 && status) {
             const sheet = workbook.Sheets[sheetNames[index]];
             // console.log('sheet name : '+ workbook.SheetNames[index]+ ' ,rebel : '+SHEETREBEL[sheetRebel]);
 
             if (sheetNames[index] == SHEETREBEL[sheetRebel]) {
-                if (OLDORGSHEETNAME == SHEETREBEL[sheetRebel]) {
+                if (OLD_ORG_SHEET_NAME == SHEETREBEL[sheetRebel]) {
+
                     //USE LIBERY XLSX TO GET DATA FROM EXCEL AND CONVERT DATA TO JSON TYPE
                     const jsonData = xlsx.utils.sheet_to_json(sheet);
 
@@ -63,12 +65,14 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                     oldOrgData = OrganizeToModel(jsonData);
 
                     //DELETE DUPLICATE DATA OF GROUP SHEET DATA
-                    if(oldOrgData.length) {
+                    if (oldOrgData.length) {
+                        sheetNullData++; //ADD NULL SHEET DATA INDEX TO THE NEXT ONE
+
                         uniqueOrgData = Array.from(
                             new Map(oldOrgData.map(data => [data.doc, data])).values()
                         );
                     } else {
-                        errorLog.push(`ชีทโครงสร้าง : ${readErrorReason}`);
+                        errorLog.push(`ชีท "โครงสร้าง" : ${readErrorReason}`);
                     }
 
                     //NEW FORMAT OF ORGANIZE STRUCTURE 
@@ -87,7 +91,8 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                         bucketArr = FormatBucket(uniqueOrgData, groupData);
                     }
 
-                } else if (OLDUSERINFOSHEETNAME == SHEETREBEL[sheetRebel]) {
+                } else if (OLD_USERINFO_SHEET_NAME == SHEETREBEL[sheetRebel]) {
+
                     //CONFIG XLSX LIBRARY TO GET ANY ROW OF SHEET
                     const jsonData = xlsx.utils.sheet_to_json(sheet, {
                         raw: true,
@@ -96,10 +101,14 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
 
                     //USER INFO SHEET 
                     oldUserData = UserInfoToModel(jsonData);
-                    if (oldUserData && newOrgData.length) {
-                        [newUserData, userArr] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
+                    if (oldUserData.length) {
+                        sheetNullData++; //ADD NULL SHEET DATA INDEX TO THE NEXT ONE
+
+                        if (newOrgData.length) {
+                            [newUserData, userArr] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
+                        }
                     } else {
-                        errorLog.push(`ชีทข้อมูลผู้ใช้ : ${readErrorReason}`);
+                        errorLog.push(`ชีท "ข้อมูลผู้ใช้" : ${readErrorReason}`);
                     }
 
                     //PERMISSION SHEET DATA
@@ -116,7 +125,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                 ++sheetRebel;
             }
 
-            if (sheetRebel >= SHEETREBEL.length) {
+            if (sheetRebel > SHEETREBEL.length - 1) {
                 status = false;
             }
 
@@ -124,14 +133,15 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
         }
 
         if (newOrgArr.length && groupArr && userArr.length && bucketArr.length && permissionArr) {
+
             //All SHEET OF ONE EXCEL FILE
             const datasets: { name: string; data: (string | number)[][] }[] = [
-                { name: NEWORGSHEETNAME, data: newOrgArr },
-                { name: GROUPSHEETNAME, data: groupArr },
-                { name: NEWUSERINFOSHEETNAME, data: userArr },
-                { name: NEWBUCKETSHEETNAME, data: bucketArr },
-                { name: NEWPERMISSIONSHEETNAME, data: permissionArr },
-                { name: NEWSIGNPERSONSHEETNAME, data: signPersonArr }
+                { name: NEW_ORG_SHEET_NAME, data: newOrgArr },
+                { name: GROUP_SHEET_NAME, data: groupArr },
+                { name: NEW_USERINFO_SHEET_NAME, data: userArr },
+                { name: NEW_BUCKET_SHEET_NAME, data: bucketArr },
+                { name: NEW_PERMISSION_SHEET_NAME, data: permissionArr },
+                { name: NEW_SIGN_PERSON_SHEET_NAME, data: signPersonArr }
             ];
 
             //CREATE NEW WORKBOOK
@@ -148,8 +158,10 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
             const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
 
             return [buffer, errorLog.join("\n")];
+        } else if (sheetRebel <= SHEETREBEL.length - 1 && sheetRebel == sheetNullData) { //CHECK IF SHEET ARE NOT FOUND OR NOT
+            errorLog.push(`ชีท "${SHEETREBEL[sheetRebel]}" : ${sheetError}`);
+            return [Buffer.alloc(0), errorLog.join("\n")];
         } else {
-            errorLog.push(sheetError);
             return [Buffer.alloc(0), errorLog.join("\n")];
         }
     } catch (error) {

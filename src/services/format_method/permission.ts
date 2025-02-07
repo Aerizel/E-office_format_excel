@@ -1,14 +1,14 @@
-import { PERMISSIONCOLUMN } from "../../config/format_sheet_config";
+import { PERMISSION_COLUMN } from "../../config/format_sheet_config";
 import { groupModel } from "../../models/formatExcel/group_model";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 import { newUserInfoModel } from "../../models/formatExcel/user_info";
 
 export default function FormatPermission(orgData: orgModel[], groupData: groupModel[], userData: newUserInfoModel[]) {
     const columnName: string[] = [
-        PERMISSIONCOLUMN.bucketName,
-        PERMISSIONCOLUMN.bucketID,
-        PERMISSIONCOLUMN.name,
-        PERMISSIONCOLUMN.chrcodemp
+        PERMISSION_COLUMN.bucketName,
+        PERMISSION_COLUMN.bucketID,
+        PERMISSION_COLUMN.name,
+        PERMISSION_COLUMN.chrcodemp
     ]
 
     const pmitData: (string | number)[][] = [];

@@ -1,4 +1,4 @@
-import { GROUPCOLUMN } from "../../config/format_sheet_config";
+import { GROUP_COLUMN } from "../../config/format_sheet_config";
 import { groupModel } from "../../models/formatExcel/group_model";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
@@ -26,7 +26,7 @@ export function GroupToJson(orgData: orgModel[], aff1Name: string): groupModel[]
 
 export function GroupFormat(groupData: groupModel[]): (string | number)[][] {
     if (groupData.length) {
-        const groupColumn: string[] = [GROUPCOLUMN.groupName, GROUPCOLUMN.groupID, GROUPCOLUMN.groupRoot];
+        const groupColumn: string[] = [GROUP_COLUMN.groupName, GROUP_COLUMN.groupID, GROUP_COLUMN.groupRoot];
 
         const groupFormatData: (string | number)[][] = groupData.map((data) => (
             [data.groupName, data.groupID, data.groupRoot]

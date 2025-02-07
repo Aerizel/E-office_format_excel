@@ -1,14 +1,14 @@
-import { SIGNPERSONCOLUMN } from "../../config/format_sheet_config";
+import { SIGN_PERSON_COLUMN } from "../../config/format_sheet_config";
 import { groupModel } from "../../models/formatExcel/group_model";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 import { newUserInfoModel } from "../../models/formatExcel/user_info";
 
 export default function FormatSignPerson(orgData: orgModel[], groupData: groupModel[], userData: newUserInfoModel[]): (string | number)[][] {
     const columnName: string[] = [
-        SIGNPERSONCOLUMN.bucket_name,
-        SIGNPERSONCOLUMN.bucket_id,
-        SIGNPERSONCOLUMN.name,
-        SIGNPERSONCOLUMN.chrcodemp
+        SIGN_PERSON_COLUMN.bucket_name,
+        SIGN_PERSON_COLUMN.bucket_id,
+        SIGN_PERSON_COLUMN.name,
+        SIGN_PERSON_COLUMN.chrcodemp
     ];
 
     const signPersonArr: (string | number)[][] = [];

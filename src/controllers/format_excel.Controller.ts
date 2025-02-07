@@ -52,7 +52,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 
 //     }
 // ];
 
-export const uploadExcel = [
+export const uploadExcelFromFront = [
     upload.array("files"),
     async (req: Request, res: Response): Promise<void> => {
         const files = req.files as Express.Multer.File[];
@@ -92,7 +92,44 @@ export const uploadExcel = [
             res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์ Excel ก่อน' });
         }
     }
-]
+];
+
+export const uploadExcelFromApi = [
+    upload.array("files"),
+    async (req: Request, res: Response): Promise<void> => {
+        const files = req.files as Express.Multer.File[];
+
+        if (files !== undefined) {
+            const fileQueue: {
+                file: Express.Multer.File,
+                orgName: string,
+                status: fileStatusModel,
+            }[] = [];
+
+            //CREATE QUEUE
+            files.forEach((file) => {
+                const convertName = file.originalname.replace(/\.[^/.]+$/, "");
+                const filename = convertName + ' แก้ไข.xlsx';
+                const cutName: string | null = cutStringWithDash(convertName);
+                const orgName = cutName != null ? cutName : 'none';
+
+                fileQueue.push({
+                    file,
+                    orgName,
+                    status: {
+                        name: filename,
+                        status: "pending"
+                    }
+                })
+            });
+
+            ProcessQueue(fileQueue, res);
+
+        } else {
+            res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์ Excel ก่อน' });
+        }
+    }
+];
 
 async function ProcessQueue(fileQueue: { file: Express.Multer.File, orgName: string, status: fileStatusModel }[], res: Response) {
     const responses: responseModel[] = [];
