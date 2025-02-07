@@ -1,16 +1,16 @@
-import { BUCKETCOLUMN, BUCKETRUNCODE } from "../../config/formatSheetConfig";
-import { groupModel } from "../../models/formatExcel/GroupModel";
-import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
+import { BUCKET_COLUMN, BUCKET_RUNCODE } from "../../config/format_sheet_config";
+import { groupModel } from "../../models/formatExcel/group_model";
+import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
-export function formatBucket(orgData: orgModel[], groupData: groupModel[]): (string | number)[][] {
+export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (string | number)[][] {
     const columnName: string[] = [
-        BUCKETCOLUMN.groupName,
-        BUCKETCOLUMN.groupID,
-        BUCKETCOLUMN.bucketName,
-        BUCKETCOLUMN.bucketID,
-        BUCKETCOLUMN.type,
-        BUCKETCOLUMN.category,
-        BUCKETCOLUMN.runCode
+        BUCKET_COLUMN.groupName,
+        BUCKET_COLUMN.groupID,
+        BUCKET_COLUMN.bucketName,
+        BUCKET_COLUMN.bucketID,
+        BUCKET_COLUMN.type,
+        BUCKET_COLUMN.category,
+        BUCKET_COLUMN.runCode
     ]
 
     const bucketData: (string | number)[][] = [];
@@ -38,7 +38,7 @@ export function formatBucket(orgData: orgModel[], groupData: groupModel[]): (str
                     bucketIndex,
                     data.type,
                     i,
-                    BUCKETRUNCODE
+                    BUCKET_RUNCODE
                 ]);
                 bucketIndex++;
             }
@@ -50,7 +50,7 @@ export function formatBucket(orgData: orgModel[], groupData: groupModel[]): (str
                 bucketIndex,
                 data.type,
                 index%2 ? 3 : 2,
-                BUCKETRUNCODE
+                BUCKET_RUNCODE
             ]);
             bucketIndex++;
         }

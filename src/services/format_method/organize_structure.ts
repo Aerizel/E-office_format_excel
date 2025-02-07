@@ -1,19 +1,20 @@
-import { NEWORGCOLUMN, OLDORGCOLUMN, STARTORGCODE } from "../../config/formatSheetConfig";
-import { orgModel } from "../../models/formatExcel/OrganizeStructureModel";
+import { NEW_ORG_COLUMN, OLD_ORG_COLUMN, START_ORG_CODE } from "../../config/format_sheet_config";
+import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
-export function organizeToModel(sheetData: any): orgModel[] {
+export function OrganizeToModel(sheetData: any): orgModel[] {
     const orgStr = JSON.stringify(sheetData);
     const orgObj = JSON.parse(orgStr);
+
     const orgData: orgModel[] = [];
     let type: number = 1;
 
     for (var data of orgObj) {
-        const orgName: string = data[OLDORGCOLUMN.doc];
-        const orgStatus: boolean = data[OLDORGCOLUMN.status];
-        const pCommit: string = data[OLDORGCOLUMN.pCommit];
-        const pPermit: string = data[OLDORGCOLUMN.pPermit];
+        const orgName: string = data[OLD_ORG_COLUMN.doc];
+        const orgStatus: boolean = data[OLD_ORG_COLUMN.status];
+        const pCommit: string = data[OLD_ORG_COLUMN.pCommit];
+        const pPermit: string = data[OLD_ORG_COLUMN.pPermit];
 
-        if (orgName === OLDORGCOLUMN.doc2) {
+        if (orgName === OLD_ORG_COLUMN.doc2) {
             type = 2;
         }
 
@@ -34,9 +35,9 @@ export function organizeToModel(sheetData: any): orgModel[] {
     return orgData;
 }
 
-export function formatOrganizeStructure(sheetData: orgModel[], affName1: string): [orgModel[], (string | number)[][]] {
-    let chcodemp = STARTORGCODE - 1;
-    const orgColumn: string[] = [NEWORGCOLUMN.affiliation1, NEWORGCOLUMN.affiliation2, NEWORGCOLUMN.affiliation3, NEWORGCOLUMN.chrcodemp];
+export function FormatOrganizeStructure(sheetData: orgModel[], affName1: string): [orgModel[], (string | number)[][]] {
+    let chcodemp = START_ORG_CODE - 1;
+    const orgColumn: string[] = [NEW_ORG_COLUMN.affiliation1, NEW_ORG_COLUMN.affiliation2, NEW_ORG_COLUMN.affiliation3, NEW_ORG_COLUMN.chrcodemp];
     const affiliation1: string[] = [affName1, '', ''];
 
     /*const orgData: (string | number)[][] = sheetData.map((data, index) => {

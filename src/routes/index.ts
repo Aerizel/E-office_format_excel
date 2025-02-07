@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { uploadExcel } from "../controllers/FormatExcel.Controller";
+import { uploadExcelFromApi, uploadExcelFromFront } from "../controllers/format_excel.Controller";
 
 const router = Router();
 
-router.post('/FormatExcel', uploadExcel);
+router.post('/FormatExcel', uploadExcelFromFront);
+router.post('/api/FormatExcel', uploadExcelFromApi);
 
 export default router;

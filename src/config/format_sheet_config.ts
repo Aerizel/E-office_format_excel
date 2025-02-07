@@ -1,31 +1,32 @@
 //=======[ORGANIZE STRUCTURE SHEET]=======//
-export const OLDORGSHEETNAME = "โครงสร้างองค์กร";
-export const OLDORGCOLUMN = {
+export const OLD_ORG_SHEET_NAME = "โครงสร้างองค์กร";
+export const OLD_ORG_COLUMN = {
     doc: "แฟ้มทะเบียนรับ - ส่งภายใน",
     doc2: "แฟ้มทะเบียนรับ - ส่งภายนอก",
     status: "__EMPTY",
     pCommit: "__EMPTY_1",
     pPermit: "__EMPTY_2"
 }
-export const NEWORGSHEETNAME = "โครงสร้างองค์กรlm";
-export const NEWORGCOLUMN = {
+export const NEW_ORG_SHEET_NAME = "โครงสร้างองค์กรlm";
+export const NEW_ORG_COLUMN = {
     affiliation1: "สังกัดหน่วยงานลำดับ 1 สำนักงาน/ชื่อหน่วยงาน",
     affiliation2: "สังกัดหน่วยงานลำดับ 2 กอง/ศูนย์/สำนัก",
     affiliation3: "สังกัดหน่วยงานลำดับ 3 กลุ่ม/ฝ่าย",
     chrcodemp:"chrcodemp"
 }
-export const STARTORGCODE = 3001
+export const START_ORG_CODE = 3001
 //=======[GROUP SHEET]=======//
-export const GROUPSHEETNAME = "Group";
-export const GROUPCOLUMN = {
+export const GROUP_SHEET_NAME = "Group";
+export const GROUP_COLUMN = {
     groupName: "Group name",
     groupID: "Group ID",
     groupRoot: "Group Root"
 }
 //=======[GROUP SHEET]=======//
-export const OLDUSERINFOSHEETNAME = "ข้อมูลผู้ใช้งาน";
-export const NEWUSERINFOSHEETNAME = "ข้อมูลผู้ใช้งานlm";
-export const NEWUSERINFOCOLUMN = {
+export const OLD_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งาน";
+export const NEW_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งานlm";
+export const OLD_USERINFO_SHEET_COLUMN_AMOUNT = 13;
+export const NEW_USERINFO_COLUMN = {
     thaiPrefix: "คำนำหน้า(ภาษาไทย)",
     thaiName: "ชื่อ(ภาษาไทย)",
     thaiSurname: "นามสกุล(ภาษาไทย)",
@@ -44,10 +45,10 @@ export const NEWUSERINFOCOLUMN = {
     empInfo: "ข้อมูลสำหรับเจ้าหน้าที่ระบบ",
     chrcodeemp2: "chrcodemp",
 };
-export const STARTUSERINFOCODE = 1001
+export const START_USERINFO_CODE = 1001
 //=======[BUCKET SHEET]=======//
-export const NEWBUCKETSHEETNAME = "Bucket";
-export const BUCKETCOLUMN = {
+export const NEW_BUCKET_SHEET_NAME = "Bucket";
+export const BUCKET_COLUMN = {
     groupName: "Group_name",
     groupID: "Group_ID",
     bucketName: "Bucket_name",
@@ -56,18 +57,18 @@ export const BUCKETCOLUMN = {
     category: "category",
     runCode: "run code",
 }
-export const BUCKETRUNCODE = "%r1%";
+export const BUCKET_RUNCODE = "%r1%";
 //=======[PERMISSION SHEET]=======//
-export const NEWPERMISSIONSHEETNAME = "permission";
-export const PERMISSIONCOLUMN = {
+export const NEW_PERMISSION_SHEET_NAME = "permission";
+export const PERMISSION_COLUMN = {
     bucketName: "bucket_name",
     bucketID: "bucket_id",
     name: "ชื่อ-สกุล",
     chrcodemp: "chrcodemp",
 }
 //=======[SIGN-PERSON]=======//
-export const NEWSIGNPERSONSHEETNAME = "sign-person";
-export const SIGNPERSONCOLUMN = {
+export const NEW_SIGN_PERSON_SHEET_NAME = "sign-person";
+export const SIGN_PERSON_COLUMN = {
     bucket_name: "bucket_name",
     bucket_id: "bucket_id",
     name: "ชื่อ-นามสกุล",
@@ -76,8 +77,8 @@ export const SIGNPERSONCOLUMN = {
 
 //=======[SHEET REBEL NAME FOR SEARCH]=======//
 export const SHEETREBEL = [
-    OLDORGSHEETNAME,
-    OLDUSERINFOSHEETNAME
+    OLD_ORG_SHEET_NAME,
+    OLD_USERINFO_SHEET_NAME
 ]
 
 
