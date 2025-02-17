@@ -1,0 +1,14 @@
+services:
+  api:
+    image: aerizel/format-excel-backend
+    ports:
+      - 4000:4000
+    restart: always
+    env_file:
+      - path: ./.env
+        required: true
+    command: npm run dev
+
+networks:
+  Format-Sheet-backend:
+    external: true
