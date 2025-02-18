@@ -11,10 +11,6 @@ services:
     env_file:
       - path: ./.env
         required: true
-    environment:
-      - FRONTEND_DEV_URL=http://localhost:3000
-      - FRONTEND_PRODUCT_URL=http://localhost:3000
-      - NODE_ENV=production
     command: npm run dev
 
 networks:
