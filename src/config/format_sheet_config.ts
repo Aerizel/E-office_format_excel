@@ -1,3 +1,5 @@
+import { group } from "console";
+
 //=======[ORGANIZE STRUCTURE SHEET]=======//
 export const OLD_ORG_SHEET_NAME = "โครงสร้างองค์กร";
 export const OLD_ORG_COLUMN = {
@@ -26,6 +28,37 @@ export const GROUP_COLUMN = {
 export const OLD_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งาน";
 export const NEW_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งานlm";
 export const OLD_USERINFO_SHEET_COLUMN_AMOUNT = 13;
+// export const OLD_USERINFO_COLUMN = {
+//     thaiPrefix: "คำนำหน้า(ภาษาไทย)",
+//     thaiName: "ชื่อ(ภาษาไทย)",
+//     thaiSurname: "นามสกุล(ภาษาไทย)",
+//     engPrefix: "คำนำหน้า(ภาษาอังกฤษ)",
+//     engName: "ชื่อ(ภาษาอังกฤษ)",
+//     engSurname: "นามสกุล(ภาษาอังกฤษ)",
+//     nickname: "ชื่อเล่น",
+//     officePhone: "เบอร์โทรศัพท์สำนักงาน",
+//     email: "E-mail",
+//     role: "ตำแหน่ง",
+//     group: "กอง/สำนัก/ศูนย์",
+//     username: "Username",
+//     empInfo: "ข้อมูลสำหรับเจ้าหน้าที่ระบบ"
+// };
+export const OLD_USERINFO_COLUMN = [
+    'คำนำหน้า(ภาษาไทย)',
+    'ชื่อ(ภาษาไทย)',
+    'นามสกุล(ภาษาไทย)',
+    'คำนำหน้า(ภาษาอังกฤษ)',
+    'ชื่อ(ภาษาอังกฤษ)',
+    'นามสกุล(ภาษาอังกฤษ)',
+    'ชื่อเล่น',
+    'เบอร์โทรศัพท์สำนักงาน',
+    'E-mail',
+    'ตำแหน่ง',
+    'กอง/สำนัก/ศูนย์',
+    'Username',
+    'ข้อมูลสำหรับเจ้าหน้าที่ระบบ'
+]
+
 export const NEW_USERINFO_COLUMN = {
     thaiPrefix: "คำนำหน้า(ภาษาไทย)",
     thaiName: "ชื่อ(ภาษาไทย)",

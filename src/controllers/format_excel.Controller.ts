@@ -5,10 +5,10 @@ import { fileStatusModel } from "../models/orther/statusFile";
 // import * as fs from 'fs';
 // import path from 'path';
 import { responseModel } from "../models/orther/responseModel";
-import { cutStringWithDash } from "../utils/formatString";
+import { CreateQueueServices } from "../services/create_queue.services";
 
 // Configure Multer to handle file upload
-//const upload = multer({ storage: multer.memoryStorage() });
+// const upload = multer({ storage: multer.memoryStorage() });
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }); //limit size to 50 MB
 
 // Single file upload method
@@ -58,36 +58,10 @@ export const uploadExcelFromFront = [
         const files = req.files as Express.Multer.File[];
 
         if (files !== undefined) {
-            const fileQueue: {
-                file: Express.Multer.File,
-                orgName: string,
-                status: fileStatusModel,
-            }[] = [];
-
             //CREATE QUEUE
-            files.forEach((file) => {
-                // const name = decodeURIComponent(
-                //     Buffer.from(file.originalname, "binary").toString("utf-8")
-                // );
-                //console.log('file name: '+file.originalname);
-
-                const convertName = Buffer.from(`${file.originalname.replace(/\.[^/.]+$/, "")}`, "latin1").toString("utf8");
-                const filename = convertName + ' แก้ไข.xlsx';
-                const cutName: string | null = cutStringWithDash(convertName);
-                const orgName = cutName != null ? cutName : 'none';
-
-                fileQueue.push({
-                    file,
-                    orgName,
-                    status: {
-                        name: filename,
-                        status: "pending"
-                    }
-                })
-            });
-
+            const fileQueue = CreateQueueServices(files, true);
+            //SEND QUEUE TO PROCESS
             ProcessQueue(fileQueue, res);
-
         } else {
             res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์ Excel ก่อน' });
         }
@@ -100,65 +74,48 @@ export const uploadExcelFromApi = [
         const files = req.files as Express.Multer.File[];
 
         if (files !== undefined) {
-            const fileQueue: {
-                file: Express.Multer.File,
-                orgName: string,
-                status: fileStatusModel,
-            }[] = [];
-
             //CREATE QUEUE
-            files.forEach((file) => {
-                const convertName = file.originalname.replace(/\.[^/.]+$/, "");
-                const filename = convertName + ' แก้ไข.xlsx';
-                const cutName: string | null = cutStringWithDash(convertName);
-                const orgName = cutName != null ? cutName : 'none';
-
-                fileQueue.push({
-                    file,
-                    orgName,
-                    status: {
-                        name: filename,
-                        status: "pending"
-                    }
-                })
-            });
-
+            const fileQueue = CreateQueueServices(files, false);
+            //SEND QUEUE TO PROCESS
             ProcessQueue(fileQueue, res);
-
         } else {
             res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์ Excel ก่อน' });
         }
     }
 ];
 
-async function ProcessQueue(fileQueue: { file: Express.Multer.File, orgName: string, status: fileStatusModel }[], res: Response) {
+async function ProcessQueue(fileQueue: { file: Express.Multer.File, fileInfo: fileStatusModel }[], res: Response) {
     const responses: responseModel[] = [];
 
     while (fileQueue.length > 0) {
-        const { file, orgName, status } = fileQueue.shift()!;
+        const { file, fileInfo } = fileQueue.shift()!;
+        const fileName = fileInfo.name;
 
         try {
             let excelBuffer: Buffer = Buffer.alloc(0);
-            let errorLog: string = '';
+            let errorLog: string = fileInfo.fail_log;
 
-            //FORMAT EXCEL 
-            [excelBuffer, errorLog] = await FormatExcel(file.buffer, orgName);
+            //CHECK IF THIS FILE HAVE ERROR LOG
+            if(errorLog == '') {
+                //FORMAT EXCEL
+                [excelBuffer, errorLog] = await FormatExcel(file.buffer, fileInfo.orgName);
+            }
 
             if (excelBuffer.length > 0) {
                 responses.push({
-                    name: status.name,
+                    name: fileName,
                     status: 'success',
                     fail: errorLog,
                     file: excelBuffer.toString("base64"),
                 });
             } else {
                 //SET FAIL STATUS FOR THIS FILE
-                responses.push({ name: status.name, status: "failed", fail: errorLog, file: '' });
+                responses.push({ name: fileName, status: "failed", fail: errorLog, file: '' });
             }
 
         } catch (error) {
             //SET FAIL STATUS FOR THIS FILE
-            responses.push({ name: status.name, status: "failed", fail: 'เกิดข้อผิดพลาด', file: '' });
+            responses.push({ name: fileName, status: "failed", fail: 'เกิดข้อผิดพลาด', file: '' });
             console.log(error);
         }
     }

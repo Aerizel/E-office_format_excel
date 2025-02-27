@@ -92,11 +92,12 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                     }
 
                 } else if (OLD_USERINFO_SHEET_NAME == SHEETREBEL[sheetRebel]) {
-
                     //CONFIG XLSX LIBRARY TO GET ANY ROW OF SHEET
                     const jsonData = xlsx.utils.sheet_to_json(sheet, {
                         raw: true,
                         defval: "",
+                        blankrows: false, 
+                        skipHidden: true 
                     });
 
                     //USER INFO SHEET 

@@ -1,4 +1,4 @@
-import { NEW_USERINFO_COLUMN, OLD_USERINFO_SHEET_COLUMN_AMOUNT, START_USERINFO_CODE } from "../../config/format_sheet_config";
+import { NEW_USERINFO_COLUMN, OLD_USERINFO_COLUMN, OLD_USERINFO_SHEET_COLUMN_AMOUNT, START_USERINFO_CODE } from "../../config/format_sheet_config";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/user_info";
 
@@ -7,34 +7,58 @@ export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     const userObj: Record<string, any>[] = JSON.parse(orgStr);
     let userInfo: oldUserInfoModel[] = [];
 
-    for (var data of userObj) {
-        let countCheck = 0;
-        const userInfoArr = Object.entries(data).map(([key, value]) => {
-            countCheck++;
-            return value;
+    let arr_index: number[] = [];
+    let index_check: number = 0;
+    let found_index: boolean = false;
+    let out_of_loop: boolean = false;
+
+    //CHECK COLUMN NAME IF IS MATCH OR NOT
+    while (index_check < OLD_USERINFO_SHEET_COLUMN_AMOUNT && !out_of_loop) {
+        Object.entries(userObj[0]).map(([key, value], index) => {
+            const oldColName = key.replace(/[\r\n ]+/g, '').replace(/\*.*$/, '');
+            if (oldColName.includes(OLD_USERINFO_COLUMN[index_check])) {
+                arr_index.push(index);
+                index_check++;
+                found_index = true;
+            }
         });
 
-        if (countCheck === OLD_USERINFO_SHEET_COLUMN_AMOUNT) {
-            const userData: oldUserInfoModel = {
-                thaiPrefix: userInfoArr[0],
-                thaiName: userInfoArr[1],
-                thaiSurname: userInfoArr[2],
-                engPrefix: userInfoArr[3],
-                engName: userInfoArr[4],
-                engSurname: userInfoArr[5],
-                nickname: userInfoArr[6],
-                officePhone: userInfoArr[7],
-                email: userInfoArr[8],
-                role: userInfoArr[9],
-                officeName: userInfoArr[10],
-                username: userInfoArr[11],
-                empInfo: userInfoArr[12],
-            }
-
-            userInfo.push(userData);
-        }
+        out_of_loop = found_index ? false : true;
     }
 
+    //CHECK ALL NECESSARY COLUMN AMOUNT THAT HAVE ALL OF THEM OR NOT 
+    const status = arr_index.length == OLD_USERINFO_SHEET_COLUMN_AMOUNT ? true : false;
+
+    if (status) {
+        for (var data of userObj) {
+            //GET ONE ROW OF DATA FOR EACH COLUMN
+            const userInfoArr = Object.entries(data).map(([key, value]) => {
+                return value;
+            });
+
+            //CHECK IF VALUE OF ROW IN THAT COLUMN IS NULL OR NOT
+            if (userInfoArr[arr_index[0]] && userInfoArr[arr_index[1]] && userInfoArr[arr_index[2]] && userInfoArr[arr_index[3]] && userInfoArr[arr_index[4]] && userInfoArr[arr_index[5]]) {
+                //INSERT ONE ROW OF DATA INTO NEW ARRAY STRUCTURE
+                const userData: oldUserInfoModel = {
+                    thaiPrefix: userInfoArr[arr_index[0]],
+                    thaiName: userInfoArr[arr_index[1]],
+                    thaiSurname: userInfoArr[arr_index[2]],
+                    engPrefix: userInfoArr[arr_index[3]],
+                    engName: userInfoArr[arr_index[4]],
+                    engSurname: userInfoArr[arr_index[5]],
+                    nickname: userInfoArr[arr_index[6]],
+                    officePhone: userInfoArr[arr_index[7]],
+                    email: userInfoArr[arr_index[8]],
+                    role: userInfoArr[arr_index[9]],
+                    officeName: userInfoArr[arr_index[10]],
+                    username: userInfoArr[arr_index[11]],
+                    empInfo: userInfoArr[arr_index[12]],
+                }
+
+                userInfo.push(userData);
+            }
+        }
+    }
     return userInfo;
 }
 
