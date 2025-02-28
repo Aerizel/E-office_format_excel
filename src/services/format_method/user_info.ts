@@ -5,20 +5,20 @@ import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/use
 export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     const orgStr = JSON.stringify(sheetData);
     const userObj: Record<string, any>[] = JSON.parse(orgStr);
-    const entries = Object.entries(userObj[0]);
+    const entries = Object.entries(userObj[0]); //USE ONLY ONE ROW OF OBJECT JUST FOR COLUMN
 
     let userInfo: oldUserInfoModel[] = [];
     let arr_index: number[] = [];
     let index_check: number = 0;
-    let found_index: boolean = false;
     let out_of_loop: boolean = false;
 
     //CHECK COLUMN NAME IF IS MATCH OR NOT IF MATCH THEN STORE INDEX OF THAT COLUMN
     while (index_check < OLD_USERINFO_SHEET_COLUMN_AMOUNT && !out_of_loop) {
         let i: number = 0;
+        let found_index: boolean = false;
 
         while (i < entries.length && i != -1) {
-            const [key, value] = entries[i];
+            const [key, value] = entries[i]; //GET ONLY COLUMN NAME OUT
             const oldColName = key.replace(/[\r\n ]+/g, '').replace(/\*.*$/, '');
             if (oldColName.includes(OLD_USERINFO_COLUMN[index_check])) {
                 arr_index.push(i);
