@@ -5,23 +5,29 @@ import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/use
 export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     const orgStr = JSON.stringify(sheetData);
     const userObj: Record<string, any>[] = JSON.parse(orgStr);
-    let userInfo: oldUserInfoModel[] = [];
+    const entries = Object.entries(userObj[0]);
 
+    let userInfo: oldUserInfoModel[] = [];
     let arr_index: number[] = [];
     let index_check: number = 0;
     let found_index: boolean = false;
     let out_of_loop: boolean = false;
 
-    //CHECK COLUMN NAME IF IS MATCH OR NOT
+    //CHECK COLUMN NAME IF IS MATCH OR NOT IF MATCH THEN STORE INDEX OF THAT COLUMN
     while (index_check < OLD_USERINFO_SHEET_COLUMN_AMOUNT && !out_of_loop) {
-        Object.entries(userObj[0]).map(([key, value], index) => {
+        let i: number = 0;
+
+        while (i < entries.length && i != -1) {
+            const [key, value] = entries[i];
             const oldColName = key.replace(/[\r\n ]+/g, '').replace(/\*.*$/, '');
             if (oldColName.includes(OLD_USERINFO_COLUMN[index_check])) {
-                arr_index.push(index);
+                arr_index.push(i);
                 index_check++;
                 found_index = true;
+                i = -1;
             }
-        });
+            i++;
+        }
 
         out_of_loop = found_index ? false : true;
     }
@@ -29,6 +35,7 @@ export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     //CHECK ALL NECESSARY COLUMN AMOUNT THAT HAVE ALL OF THEM OR NOT 
     const status = arr_index.length == OLD_USERINFO_SHEET_COLUMN_AMOUNT ? true : false;
 
+    //IF SHEET HAVE ALL REQUIRE COLUMN THEN STORE VALUE
     if (status) {
         for (var data of userObj) {
             //GET ONE ROW OF DATA FOR EACH COLUMN
