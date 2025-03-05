@@ -25,6 +25,7 @@ type newUserInfoModel = {
     officePhone: string,
     email: string,
     role: string,
+    roleKey: number,
     affiliation1: string,
     affiliation2: string,
     affiliation3: string,
@@ -32,6 +33,7 @@ type newUserInfoModel = {
     username: string,
     empInfo: string,
     chrcodemp2: number,
+    sex: string
 }
 
 export {
