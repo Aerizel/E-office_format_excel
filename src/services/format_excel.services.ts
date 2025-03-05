@@ -1,5 +1,5 @@
 import * as xlsx from 'xlsx';
-import { GROUP_SHEET_NAME, NEW_BUCKET_SHEET_NAME, NEW_ORG_SHEET_NAME, NEW_PERMISSION_SHEET_NAME, NEW_SIGN_PERSON_SHEET_NAME, NEW_USERINFO_SHEET_NAME, OLD_ORG_SHEET_NAME, OLD_USERINFO_SHEET_NAME, SHEETREBEL } from '../config/format_sheet_config';
+import { GENERAL_SHEET_NAME, GROUP_SHEET_NAME, NEW_BUCKET_SHEET_NAME, NEW_ORG_SHEET_NAME, NEW_PERMISSION_SHEET_NAME, NEW_SIGN_PERSON_SHEET_NAME, NEW_USERINFO_SHEET_NAME, OLD_ORG_SHEET_NAME, OLD_USERINFO_SHEET_NAME, ROLE_SHEET_NAME, SHEETREBEL } from '../config/format_sheet_config';
 import { OrganizeToModel, FormatOrganizeStructure } from './format_method/organize_structure';
 import { orgModel } from '../models/formatExcel/organize_structure_model';
 import { groupModel } from '../models/formatExcel/group_model';
@@ -9,6 +9,8 @@ import { FormatUserInfo, UserInfoToModel } from './format_method/user_info';
 import { FormatBucket } from './format_method/bucket';
 import formatPermission from './format_method/permission';
 import formatSignPerson from './format_method/signPerson';
+import { roleModel } from '../models/formatExcel/role_model';
+import FormatRole from './format_method/role';
 
 export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise<[Buffer, string]> {
     const tempAffName = fileName;
@@ -21,6 +23,9 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
         const sheetNames = workbook.SheetNames;
 
         //const allSheetsData: Record<string, any[]> = {};
+
+        //GENERAL
+        let generalSheet: xlsx.WorkSheet = {};
 
         //ORGANIZE
         let oldOrgData: orgModel[] = [];
@@ -46,6 +51,10 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
         //SIGN-PERSON
         let signPersonArr: (string | number)[][] = [];
 
+        //ROLE
+        let roleData: roleModel[] = [];
+        let roleArr: (string | number)[][] = [];
+
         let index: number = 0;
         let sheetRebel: number = 0;
         let sheetNullData: number = 0;
@@ -56,7 +65,12 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
             // console.log('sheet name : '+ workbook.SheetNames[index]+ ' ,rebel : '+SHEETREBEL[sheetRebel]);
 
             if (sheetNames[index] == SHEETREBEL[sheetRebel]) {
-                if (OLD_ORG_SHEET_NAME == SHEETREBEL[sheetRebel]) {
+                if (GENERAL_SHEET_NAME == SHEETREBEL[sheetRebel]) {
+
+                    //Add entry original sheet 
+                    generalSheet = sheet;
+
+                } else if (OLD_ORG_SHEET_NAME == SHEETREBEL[sheetRebel]) {
 
                     //USE LIBERY XLSX TO GET DATA FROM EXCEL AND CONVERT DATA TO JSON TYPE
                     const jsonData = xlsx.utils.sheet_to_json(sheet);
@@ -106,7 +120,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                         sheetNullData++; //ADD NULL SHEET DATA INDEX TO THE NEXT ONE
 
                         if (newOrgData.length) {
-                            [newUserData, userArr] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
+                            [newUserData, userArr, roleData] = FormatUserInfo(tempAffName, oldUserData, newOrgData);
                         }
                     } else {
                         errorLog.push(`ชีท "ข้อมูลผู้ใช้" : ${readErrorReason}`);
@@ -120,6 +134,11 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                     //SIGN-PERSON SHEET DATA
                     if (oldOrgData.length && groupData.length && newUserData.length) {
                         signPersonArr = formatSignPerson(oldOrgData, groupData, newUserData);
+                    }
+
+                    //ROLE SHEET DATA
+                    if (roleData.length) {
+                        roleArr = FormatRole(roleData);
                     }
                 }
 
@@ -142,13 +161,17 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                 { name: NEW_USERINFO_SHEET_NAME, data: userArr },
                 { name: NEW_BUCKET_SHEET_NAME, data: bucketArr },
                 { name: NEW_PERMISSION_SHEET_NAME, data: permissionArr },
-                { name: NEW_SIGN_PERSON_SHEET_NAME, data: signPersonArr }
+                { name: NEW_SIGN_PERSON_SHEET_NAME, data: signPersonArr },
+                { name: ROLE_SHEET_NAME, data: roleArr }
             ];
 
             //CREATE NEW WORKBOOK
             workbook = xlsx.utils.book_new();
 
-            //CREATE NEW EXCEL FILE THAT HAVE NEW SHEET INSIDE IT
+            //CREATE GENERAL SHEET FROM ORIGINAL SHEET
+            xlsx.utils.book_append_sheet(workbook, generalSheet, GENERAL_SHEET_NAME);
+
+            //CREATE NEW SHEET FROM NEW FORMAT 
             datasets.forEach(dataset => {
                 const worksheet: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(dataset.data);
                 xlsx.utils.book_append_sheet(workbook, worksheet, dataset.name);

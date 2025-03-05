@@ -1,6 +1,8 @@
-import { NEW_USERINFO_COLUMN, OLD_USERINFO_COLUMN, OLD_USERINFO_SHEET_COLUMN_AMOUNT, START_USERINFO_CODE } from "../../config/format_sheet_config";
+import { GENDER_CHECK, NEW_USERINFO_COLUMN, OLD_USERINFO_COLUMN, OLD_USERINFO_SHEET_COLUMN_AMOUNT, START_USERINFO_CODE } from "../../config/format_sheet_config";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
+import { roleModel } from "../../models/formatExcel/role_model";
 import { newUserInfoModel, oldUserInfoModel } from "../../models/formatExcel/user_info";
+import { GenerateRoleKey } from "./role";
 
 export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     const orgStr = JSON.stringify(sheetData);
@@ -69,103 +71,116 @@ export function UserInfoToModel(sheetData: any): oldUserInfoModel[] {
     return userInfo;
 }
 
-export function FormatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): [newUserInfoModel[], (string | number)[][]] {
-    if (sheetData.length, orgData.length) {
-        let chrcodemp2 = START_USERINFO_CODE - 1;
+export function FormatUserInfo(affName: string, sheetData: oldUserInfoModel[], orgData: orgModel[]): [newUserInfoModel[], (string | number)[][], roleModel[]] {
 
-        const userInfoColumn: string[] = [
-            NEW_USERINFO_COLUMN.thaiPrefix,
-            NEW_USERINFO_COLUMN.thaiName,
-            NEW_USERINFO_COLUMN.thaiSurname,
-            NEW_USERINFO_COLUMN.engPrefix,
-            NEW_USERINFO_COLUMN.engName,
-            NEW_USERINFO_COLUMN.engSurname,
-            NEW_USERINFO_COLUMN.nickname,
-            NEW_USERINFO_COLUMN.officePhone,
-            NEW_USERINFO_COLUMN.email,
-            NEW_USERINFO_COLUMN.role,
-            NEW_USERINFO_COLUMN.affiliation1,
-            NEW_USERINFO_COLUMN.affiliation2,
-            NEW_USERINFO_COLUMN.affiliation3,
-            NEW_USERINFO_COLUMN.chrcodemp1,
-            NEW_USERINFO_COLUMN.username,
-            NEW_USERINFO_COLUMN.empInfo,
-            NEW_USERINFO_COLUMN.chrcodeemp2
-        ];
+    let chrcodemp2 = START_USERINFO_CODE - 1;
 
-        const userArr: (string | number)[][] = [];
-        const userData: newUserInfoModel[] = [];
+    const userInfoColumn: string[] = [
+        NEW_USERINFO_COLUMN.thaiPrefix,
+        NEW_USERINFO_COLUMN.thaiName,
+        NEW_USERINFO_COLUMN.thaiSurname,
+        NEW_USERINFO_COLUMN.engPrefix,
+        NEW_USERINFO_COLUMN.engName,
+        NEW_USERINFO_COLUMN.engSurname,
+        NEW_USERINFO_COLUMN.nickname,
+        NEW_USERINFO_COLUMN.officePhone,
+        NEW_USERINFO_COLUMN.email,
+        NEW_USERINFO_COLUMN.role,
+        NEW_USERINFO_COLUMN.roleKey,
+        NEW_USERINFO_COLUMN.affiliation1,
+        NEW_USERINFO_COLUMN.affiliation2,
+        NEW_USERINFO_COLUMN.affiliation3,
+        NEW_USERINFO_COLUMN.chrcodemp1,
+        NEW_USERINFO_COLUMN.username,
+        NEW_USERINFO_COLUMN.empInfo,
+        NEW_USERINFO_COLUMN.chrcodeemp2,
+        NEW_USERINFO_COLUMN.sex
+    ];
 
-        sheetData.map((data) => {
-            ++chrcodemp2;
+    const userArr: (string | number)[][] = [];
+    const userData: newUserInfoModel[] = [];
 
-            let chrcodemp1: number | string = '';
+    //GENERATE ROLE KEY
+    const roleData: roleModel[] = GenerateRoleKey(sheetData);
 
-            let index = 0;
-            while (orgData.length > index) {
-                if (data.officeName === orgData[index].doc) {
-                    chrcodemp1 = orgData[index].chcodemp ?? '';
-                    index = orgData.length + 1;
-                } else {
-                    ++index;
-                }
+    sheetData.map((data) => {
+        ++chrcodemp2;
+
+        let chrcodemp1: number | string = '';
+
+        let index = 0;
+        while (orgData.length > index) {
+            if (data.officeName === orgData[index].doc) {
+                chrcodemp1 = orgData[index].chcodemp ?? '';
+                index = orgData.length + 1;
+            } else {
+                ++index;
             }
+        }
 
-            /*orgData.forEach((items) => {
-                if (data.officeName === items.doc) {
-                    chrcodemp1 = items.chcodemp ?? '';
-                }
-            });*/
+        /*orgData.forEach((items) => {
+            if (data.officeName === items.doc) {
+                chrcodemp1 = items.chcodemp ?? '';
+            }
+        });*/
 
-            userData.push({
-                thaiPrefix: data.thaiPrefix,
-                thaiName: data.thaiName,
-                thaiSurname: data.thaiSurname,
-                engPrefix: data.engPrefix,
-                engName: data.engName,
-                engSurname: data.engSurname,
-                nickname: data.nickname,
-                officePhone: data.officePhone,
-                email: data.email,
-                role: data.role,
-                affiliation1: affName,
-                affiliation2: data.officeName,
-                affiliation3: data.officeName,
-                chrcodemp1: chrcodemp1,
-                username: data.username,
-                empInfo: data.empInfo,
-                chrcodemp2: chrcodemp2
-            });
+        //MATCH ROLE NAME TO NEW GENERATED ROLE KEY TO GET ROLE KEY
+        const roleKey = roleData.find((role) => role.name === data.role)?.key;
 
-            userArr.push([
-                data.thaiPrefix,
-                data.thaiName,
-                data.thaiSurname,
-                data.engPrefix,
-                data.engName,
-                data.engSurname,
-                data.nickname,
-                data.officePhone,
-                data.email,
-                data.role,
-                affName,
-                data.officeName,
-                data.officeName,
-                chrcodemp1,
-                data.username,
-                data.empInfo,
-                chrcodemp2
-            ]);
+        //MATCH GENDER FROM ENGLISH PREFIX NAME
+        const gender = data.engPrefix == GENDER_CHECK.male ? 'M' : 'F';
 
+        userData.push({
+            thaiPrefix: data.thaiPrefix,
+            thaiName: data.thaiName,
+            thaiSurname: data.thaiSurname,
+            engPrefix: data.engPrefix,
+            engName: data.engName,
+            engSurname: data.engSurname,
+            nickname: data.nickname,
+            officePhone: data.officePhone,
+            email: data.email,
+            role: data.role,
+            roleKey: roleKey ?? 0,
+            affiliation1: affName,
+            affiliation2: data.officeName,
+            affiliation3: data.officeName,
+            chrcodemp1: chrcodemp1,
+            username: data.username,
+            empInfo: data.empInfo,
+            chrcodemp2: chrcodemp2,
+            sex: gender
         });
 
-        userArr.splice(0, 0, userInfoColumn);
+        userArr.push([
+            data.thaiPrefix,
+            data.thaiName,
+            data.thaiSurname,
+            data.engPrefix,
+            data.engName,
+            data.engSurname,
+            data.nickname,
+            data.officePhone,
+            data.email,
+            data.role,
+            roleKey ?? 0,
+            affName,
+            data.officeName,
+            data.officeName,
+            chrcodemp1,
+            data.username,
+            data.empInfo,
+            chrcodemp2,
+            gender
+        ]);
 
-        return [
-            userData,
-            userArr
-        ];
-    } else {
-        return [[], []];
-    }
+    });
+
+    userArr.splice(0, 0, userInfoColumn);
+
+    return [
+        userData,
+        userArr,
+        roleData
+    ];
 }
