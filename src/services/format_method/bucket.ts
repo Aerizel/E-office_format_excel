@@ -1,8 +1,9 @@
 import { BUCKET_COLUMN, BUCKET_RUNCODE } from "../../config/format_sheet_config";
+import { bucket_model } from "../../models/formatExcel/bucket_model";
 import { groupModel } from "../../models/formatExcel/group_model";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 
-export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (string | number)[][] {
+export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): [(string | number)[][], bucket_model[]] {
     const columnName: string[] = [
         BUCKET_COLUMN.groupName,
         BUCKET_COLUMN.groupID,
@@ -14,6 +15,7 @@ export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (str
     ]
 
     const bucketData: (string | number)[][] = [];
+    const bucketJson: bucket_model[] = [];
     let bucketIndex: number = 1;
 
     orgData.map((data, index) => {
@@ -29,8 +31,18 @@ export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (str
             }
         }
 
-        if(data.type == 1) {
+        if (data.type == 1) {
             for (let i = 2; i < 4; i++) {
+                bucketJson.push({
+                    group_name: data.doc,
+                    group_id: groupID,
+                    bucket_name: data.doc,
+                    bucket_id: bucketIndex,
+                    type: data.type,
+                    category: i,
+                    run_code: BUCKET_RUNCODE
+                });
+
                 bucketData.push([
                     data.doc,
                     groupID,
@@ -43,13 +55,23 @@ export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (str
                 bucketIndex++;
             }
         } else {
+            bucketJson.push({
+                group_name: data.doc,
+                group_id: groupID,
+                bucket_name: data.doc,
+                bucket_id: bucketIndex,
+                type: data.type,
+                category: index % 2 ? 3 : 2,
+                run_code: BUCKET_RUNCODE
+            });
+
             bucketData.push([
                 data.doc,
                 groupID,
                 data.doc,
                 bucketIndex,
                 data.type,
-                index%2 ? 3 : 2,
+                index % 2 ? 3 : 2,
                 BUCKET_RUNCODE
             ]);
             bucketIndex++;
@@ -58,5 +80,5 @@ export function FormatBucket(orgData: orgModel[], groupData: groupModel[]): (str
 
     bucketData.splice(0, 0, columnName);
 
-    return bucketData;
+    return [bucketData, bucketJson];
 }

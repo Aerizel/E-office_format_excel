@@ -9,7 +9,7 @@ export const OLD_ORG_COLUMN = {
     pPermit: "__EMPTY_2"
 }
 
-export const NEW_ORG_SHEET_NAME = "โครงสร้างองค์กรlm";
+export const NEW_ORG_SHEET_NAME = "โครงสร้างองค์กร";
 export const NEW_ORG_COLUMN = {
     affiliation1: "สังกัดหน่วยงานลำดับ 1 สำนักงาน/ชื่อหน่วยงาน",
     affiliation2: "สังกัดหน่วยงานลำดับ 2 กอง/ศูนย์/สำนัก",
@@ -19,7 +19,7 @@ export const NEW_ORG_COLUMN = {
 export const START_ORG_CODE = 3001
 
 //=======[GROUP SHEET]=======//
-export const GROUP_SHEET_NAME = "Group";
+export const GROUP_SHEET_NAME = "group";
 export const GROUP_COLUMN = {
     groupName: "Group name",
     groupID: "Group ID",
@@ -28,7 +28,7 @@ export const GROUP_COLUMN = {
 
 //=======[GROUP SHEET]=======//
 export const OLD_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งาน";
-export const NEW_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งานlm";
+export const NEW_USERINFO_SHEET_NAME = "ข้อมูลผู้ใช้งาน";
 export const OLD_USERINFO_SHEET_COLUMN_AMOUNT = 13;
 // export const OLD_USERINFO_COLUMN = {
 //     thaiPrefix: "คำนำหน้า(ภาษาไทย)",
@@ -90,7 +90,7 @@ export const GENDER_CHECK = {
 };
 
 //=======[BUCKET SHEET]=======//
-export const NEW_BUCKET_SHEET_NAME = "Bucket";
+export const NEW_BUCKET_SHEET_NAME = "bucket";
 export const BUCKET_COLUMN = {
     groupName: "Group_name",
     groupID: "Group_ID",

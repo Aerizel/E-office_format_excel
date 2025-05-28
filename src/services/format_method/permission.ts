@@ -1,56 +1,46 @@
 import { PERMISSION_COLUMN } from "../../config/format_sheet_config";
+import { bucket_model } from "../../models/formatExcel/bucket_model";
 import { groupModel } from "../../models/formatExcel/group_model";
 import { orgModel } from "../../models/formatExcel/organize_structure_model";
 import { newUserInfoModel } from "../../models/formatExcel/user_info";
 
-export default function FormatPermission(orgData: orgModel[], groupData: groupModel[], userData: newUserInfoModel[]) {
+export default function FormatPermission(orgData: orgModel[], bucketData: bucket_model[], userData: newUserInfoModel[]) {
     const columnName: string[] = [
         PERMISSION_COLUMN.bucketName,
         PERMISSION_COLUMN.bucketID,
         PERMISSION_COLUMN.name,
         PERMISSION_COLUMN.chrcodemp
-    ]
+    ];
 
     const pmitData: (string | number)[][] = [];
 
-    orgData.map((data) => {
-        if (data.pCommit != null) {
-            let bucketID: number | string = '';
-            let chrcodemp: number | string = '';
+    bucketData.map((data) => {
+        //FIND AFFILIATION FROM ORGANIZE DATA THAT HAVE COMMIT PERSON
+        const index = orgData.findIndex(org => org.doc == data.bucket_name);
+        let pCommit: string | null = null;
 
-            //FIND GROUP ID FOR BUCKET ID
-            for (let i = 0; i < groupData.length; i++) {
-                if (data.doc === groupData[i].groupName) {
-                    bucketID = groupData[i].groupID ?? '';
-                    i = groupData.length;
-                }
-            }
+        if (index != -1) {
+            pCommit = orgData[index].pCommit;
+        }
+
+        //CHECK IF IT HAVE COMMIT PERSON
+        if (pCommit != null) {
+            let chrcodemp: number | string = '';
 
             //FIND USER ID FROM USERINFO FOR CHRCODEMP
             for (let j = 0; j < userData.length; j++) {
-                if (data.pCommit === userData[j].empInfo) {
+                if (pCommit === userData[j].empInfo) {
                     chrcodemp = userData[j].chrcodemp2 ?? '';
                     j = userData.length;
                 }
             }
 
-            if (data.type == 1) {
-                for (let i = 0; i < 2; i++) {
-                    pmitData.push([
-                        data.doc,
-                        bucketID,
-                        data.pCommit,
-                        chrcodemp
-                    ]);
-                }
-            } else {
-                pmitData.push([
-                    data.doc,
-                    bucketID,
-                    data.pCommit,
-                    chrcodemp
-                ]);
-            }
+            pmitData.push([
+                data.bucket_name,
+                data.bucket_id,
+                pCommit,
+                chrcodemp
+            ]);
         }
     });
 

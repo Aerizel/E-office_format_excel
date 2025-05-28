@@ -11,6 +11,7 @@ import formatPermission from './format_method/permission';
 import formatSignPerson from './format_method/signPerson';
 import { roleModel } from '../models/formatExcel/role_model';
 import FormatRole from './format_method/role';
+import { bucket_model } from '../models/formatExcel/bucket_model';
 
 export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise<[Buffer, string]> {
     const tempAffName = fileName;
@@ -43,6 +44,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
         let userArr: (string | number)[][] = [];
 
         //BUCKET
+        let bucketData: bucket_model[] = [];
         let bucketArr: (string | number)[][] = [];
 
         //PERMISSION
@@ -102,7 +104,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
 
                     //BUCKET SHEET DATA
                     if (uniqueOrgData.length && groupData) {
-                        bucketArr = FormatBucket(uniqueOrgData, groupData);
+                        [bucketArr, bucketData] = FormatBucket(uniqueOrgData, groupData);
                     }
 
                 } else if (OLD_USERINFO_SHEET_NAME == SHEETREBEL[sheetRebel]) {
@@ -127,13 +129,13 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
                     }
 
                     //PERMISSION SHEET DATA
-                    if (uniqueOrgData.length && groupData.length && newUserData.length) {
-                        permissionArr = formatPermission(uniqueOrgData, groupData, newUserData);
+                    if (uniqueOrgData.length && bucketData.length && newUserData.length) {
+                        permissionArr = formatPermission(uniqueOrgData, bucketData, newUserData);
                     }
 
                     //SIGN-PERSON SHEET DATA
-                    if (oldOrgData.length && groupData.length && newUserData.length) {
-                        signPersonArr = formatSignPerson(oldOrgData, groupData, newUserData);
+                    if (oldOrgData.length && bucketData.length && newUserData.length) {
+                        signPersonArr = formatSignPerson(oldOrgData, bucketData, newUserData);
                     }
 
                     //ROLE SHEET DATA
@@ -152,7 +154,7 @@ export async function FormatExcel(fileBuffer: Buffer, fileName: string): Promise
             ++index;
         }
 
-        if (newOrgArr.length && groupArr && userArr.length && bucketArr.length && permissionArr) {
+        if (Object.keys(generalSheet).length > 0 && newOrgArr.length && groupArr && userArr.length && bucketArr.length && permissionArr) {
 
             //All SHEET OF ONE EXCEL FILE
             const datasets: { name: string; data: (string | number)[][] }[] = [
